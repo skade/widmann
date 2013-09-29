@@ -1,5 +1,12 @@
+#[link(name = "widmannserver",
+       vers = "0.1-pre",
+       url = "")];
+
+#[crate_type = "lib"];
+
 extern mod extra;
 extern mod http;
+extern mod widmann;
 
 use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
 use std::rt::io::Writer;
@@ -7,9 +14,10 @@ use extra::time;
 
 use http::server::{Config, Server, Request, ResponseWriter};
 use http::headers::content_type::MediaType;
+use http::status::Ok;
 
-use application::*;
-use application::response::*;
+use widmann::application::*;
+use widmann::application::response::*;
 
 #[deriving(Clone)]
 pub struct WidmannServer<T> {
@@ -40,7 +48,7 @@ impl<T: ToResponse> Server for WidmannServer<T> {
 
       w.headers.content_length = Some(response.body.len());
 
-      w.status = response.status;
+      w.status = Ok; //response.status.clone();
       w.write(response.body.as_bytes());
     }
 }

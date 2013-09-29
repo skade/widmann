@@ -3,11 +3,12 @@
 extern mod extra;
 extern mod http;
 extern mod widmann;
+extern mod widmannserver;
 
 use http::server::{ServerUtil, Request};
 
 use widmann::application::*;
-use widmann::server::*;
+use widmannserver::*;
 
 fn hello_world(_request: &Request) -> ~str {
   ~"Hello World!\n"

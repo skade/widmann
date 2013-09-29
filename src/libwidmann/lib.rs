@@ -8,4 +8,3 @@ extern mod http;
 extern mod extra;
 
 pub mod application;
-pub mod server;
