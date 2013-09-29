@@ -2,6 +2,7 @@ extern mod extra;
 extern mod http;
 
 use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
+use std::rt::io::Writer;
 use extra::time;
 
 use http::server::{Config, Server, Request, ResponseWriter};
@@ -40,6 +41,6 @@ impl<T: ToResponse> Server for WidmannServer<T> {
       w.headers.content_length = Some(response.body.len());
 
       w.status = response.status;
-      //w.write(response.body.as_bytes());
+      w.write(response.body.as_bytes());
     }
 }
