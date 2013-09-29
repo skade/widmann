@@ -47,7 +47,11 @@ impl<T: ToResponse> Server for WidmannServer<T> {
 
       w.headers.content_length = Some(response.body.len());
 
-      w.status = response.status.clone();
-      w.write(response.body.as_bytes());
+      match response {
+        Response { status, body } => {
+          w.status = status;
+          w.write(body.as_bytes());
+        }
+      }
     }
 }

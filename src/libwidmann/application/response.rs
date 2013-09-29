@@ -17,6 +17,6 @@ pub trait ToResponse {
 
 impl ToResponse for ~str {
   fn to_response(self) -> Response {
-    Response::new(Ok, self.clone())
+    Response::new(Ok, self)
   }
 }
