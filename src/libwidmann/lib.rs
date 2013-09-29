@@ -3,7 +3,9 @@
        url = "")];
 
 #[crate_type = "lib"];
+#[link_args = "-lpcre"];
 
+extern mod pcre;
 extern mod http;
 extern mod extra;
 

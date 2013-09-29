@@ -1,3 +1,6 @@
+use pcre::pcre::*;
+use std::hashmap::*;
+
 use http::server::request::{Request, AbsolutePath};
 use http::method::*;
 
@@ -10,6 +13,17 @@ pub struct Route<T> {
 impl<T> Clone for Route<T> {
   fn clone(&self) -> Route<T> {
     Route { method: self.method.clone(), path: self.path.clone(), f: self.f }
+  }
+}
+
+pub struct MatchedRoute<T> {
+  params: HashMap<~str, Option<~str>>,
+  f: extern fn(&Request) -> T,
+}
+
+impl<T> Clone for MatchedRoute<T> {
+  fn clone(&self) -> MatchedRoute<T> {
+    MatchedRoute { params: self.params.clone(), f: self.f }
   }
 }
 
@@ -29,11 +43,30 @@ impl<T> Routes<T> {
     Routes { routes: ~[] }
   }
 
-  pub fn find<'a>(&'a self, request: &Request) -> Option<&'a Route<T>> {
+  pub fn find<'a>(&'a self, request: &Request) -> Option<MatchedRoute<T>> {
     match request.request_uri {
       AbsolutePath(ref path) => {
-        do self.routes.iter().find |route|
-          { route.method == request.method && route.path == path.to_str() }
+        for route in self.routes.iter() {
+          if route.method == request.method {
+            let res = search(route.path.clone(), *path, 0);
+            match res {
+              Ok(m) => {
+                let mut map = HashMap::new();
+                let group_names = m.group_names();
+                for name in group_names.iter() {
+                  let group = m.named_group(*name);
+                  match group {
+                    Some(str) => { map.insert(name.to_owned(), Some(str.to_owned())); }
+                    None => { map.insert(name.to_owned(), None); }
+                  }
+                }
+                return Some(MatchedRoute { params: map, f: route.f });
+              }
+              Err(_) => { }
+            }
+          }
+        }
+        return None
       },
       _ => { None }
     }

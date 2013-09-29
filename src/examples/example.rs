@@ -26,7 +26,7 @@ fn main() {
           settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 4000 })
         }
         do app.routes |routes| {
-          routes.get(~"/", hello_world);
+          routes.get(~"/foo/(?<bar>.*)", hello_world);
           routes.post(~"/", hello_post);
         }
       };
