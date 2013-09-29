@@ -13,10 +13,14 @@ pub struct Application<T> {
 }
 
 impl<T: ToResponse> Application<T> {
-  pub fn new(draw: &fn (&mut Routes<T>)) -> Application<T> {
-    let mut server = Application { routes: ~Routes::new() };
-    draw(server.routes);
-    server
+  pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
+    let mut app = ~Application { routes: ~Routes::new() };
+    create(app);
+    *app
+  }
+
+  pub fn routes<'a>(&'a mut self, draw: &fn(&'a mut Routes<T>)) {
+    draw(self.routes)
   }
 
   pub fn call(&self, request: &Request) -> Response {

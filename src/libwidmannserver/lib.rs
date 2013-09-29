@@ -13,7 +13,6 @@ use std::rt::io::Writer;
 use extra::time;
 
 use http::server::{Config, Server, Request, ResponseWriter};
-use http::headers::content_type::MediaType;
 
 use widmann::application::*;
 use widmann::application::response::*;
@@ -30,28 +29,24 @@ impl<T> WidmannServer<T> {
 }
 
 impl<T: ToResponse> Server for WidmannServer<T> {
-    fn get_config(&self) -> Config {
-      Config { bind_address: SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 8001 } }
-    }
+  fn get_config(&self) -> Config {
+    Config { bind_address: SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 8001 } }
+  }
 
-    fn handle_request(&self, r: &Request, w: &mut ResponseWriter) {
-      let response = self.application.call(r);
+  fn handle_request(&self, r: &Request, w: &mut ResponseWriter) {
+    let response = self.application.call(r);
 
-      w.headers.date = Some(time::now_utc());
-      w.headers.content_type = Some(MediaType {
-          type_: ~"text",
-          subtype: ~"plain",
-          parameters: ~[(~"charset", ~"UTF-8")]
-      });
-      w.headers.server = Some(~"Example");
+    w.headers.date = Some(time::now_utc());
+    w.headers.server = Some(~"Widmann");
 
-      w.headers.content_length = Some(response.body.len());
-
-      match response {
-        Response { status, body } => {
-          w.status = status;
-          w.write(body.as_bytes());
+    match response {
+      Response { status, body, headers } => {
+        w.status = status;
+        for header in headers.iter() {
+          w.headers.insert(header);
         }
+        w.write(body.as_bytes());
       }
     }
+  }
 }

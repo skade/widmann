@@ -19,10 +19,13 @@ fn hello_post(_request: &Request) -> ~str {
 }
 
 fn main() {
-    let app = do Application::new |routes| {
-      routes.get(~"/", hello_world);
-      routes.post(~"/", hello_post);
-    };
+    let app = do Application::new |app|
+      {
+        do app.routes |routes| {
+          routes.get(~"/", hello_world);
+          routes.post(~"/", hello_post);
+        }
+      };
     let server = WidmannServer::new(app);
     server.serve_forever();
 }
