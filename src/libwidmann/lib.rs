@@ -5,5 +5,7 @@
 #[crate_type = "lib"];
 
 extern mod http;
+extern mod extra;
 
-pub mod routes;
+pub mod application;
+pub mod server;
