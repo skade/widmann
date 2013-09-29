@@ -14,7 +14,6 @@ use extra::time;
 
 use http::server::{Config, Server, Request, ResponseWriter};
 use http::headers::content_type::MediaType;
-use http::status::Ok;
 
 use widmann::application::*;
 use widmann::application::response::*;
@@ -48,7 +47,7 @@ impl<T: ToResponse> Server for WidmannServer<T> {
 
       w.headers.content_length = Some(response.body.len());
 
-      w.status = Ok; //response.status.clone();
+      w.status = response.status.clone();
       w.write(response.body.as_bytes());
     }
 }
