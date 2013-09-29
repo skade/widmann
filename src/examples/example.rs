@@ -6,6 +6,7 @@ extern mod widmann;
 extern mod widmannserver;
 
 use http::server::{ServerUtil, Request};
+use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
 
 use widmann::application::*;
 use widmannserver::*;
@@ -21,6 +22,9 @@ fn hello_post(_request: &Request) -> ~str {
 fn main() {
     let app = do Application::new |app|
       {
+        do app.settings |settings| {
+          settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 4000 })
+        }
         do app.routes |routes| {
           routes.get(~"/", hello_world);
           routes.post(~"/", hello_post);

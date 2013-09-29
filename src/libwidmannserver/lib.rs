@@ -30,7 +30,15 @@ impl<T> WidmannServer<T> {
 
 impl<T: ToResponse> Server for WidmannServer<T> {
   fn get_config(&self) -> Config {
-    Config { bind_address: SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 8001 } }
+    let socket = self.application.settings.socket;
+    match socket {
+      Some(socket) => {
+        Config { bind_address: socket }
+      },
+      None => {
+        Config { bind_address: SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 8001 } }
+      }
+    }
   }
 
   fn handle_request(&self, r: &Request, w: &mut ResponseWriter) {

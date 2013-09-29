@@ -3,6 +3,7 @@ use self::response::*;
 
 use http::server::Request;
 use http::status::NotFound;
+use std::rt::io::net::ip::SocketAddr;
 
 pub mod routes;
 pub mod response;
@@ -10,13 +11,29 @@ pub mod response;
 #[deriving(Clone)]
 pub struct Application<T> {
   routes: ~Routes<T>,
+  settings: ~Settings
+}
+
+#[deriving(Clone)]
+pub struct Settings {
+  socket: Option<SocketAddr>
+}
+
+impl Settings {
+  fn new() -> Settings {
+    Settings { socket: None }
+  }
 }
 
 impl<T: ToResponse> Application<T> {
   pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
-    let mut app = ~Application { routes: ~Routes::new() };
+    let mut app = ~Application { routes: ~Routes::new(), settings: ~Settings::new() };
     create(app);
     *app
+  }
+
+  pub fn settings<'a>(&'a mut self, config: &fn(&'a mut Settings)) {
+    config(self.settings)
   }
 
   pub fn routes<'a>(&'a mut self, draw: &fn(&'a mut Routes<T>)) {
