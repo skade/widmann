@@ -13,7 +13,7 @@ Consider this a proof of concept, it has some glaring bugs. (try POSTing to `/fo
 // So you are free to invent your own return types.
 fn hello_world(context: &Context, _request: &Request) -> ~str {
   let params = &context.params;
-  let id = params.get(&~"id").clone();
+  let id = params.get_copy(&~"id");
   match id {
     Some(m) => m.to_owned(),
     None => ~"pass an ID!"

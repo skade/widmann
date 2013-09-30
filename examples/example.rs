@@ -14,7 +14,7 @@ use widmannserver::*;
 
 fn hello_world(context: &Context, _request: &Request) -> ~str {
   let params = &context.params;
-  let id = params.get(&~"id").clone();
+  let id = params.get_copy(&~"id");
   match id {
     Some(m) => m.to_owned(),
     None => ~"pass an ID!"
