@@ -59,6 +59,13 @@ build/example
 curl localhost:4000/foo/bar
 ```
 
+## TODO
+
+* Make route matching stricter
+* Implement a proper settings system
+* Templating
+* Allow to route to almost anything using traits
+
 ## License
 
 MIT, see `LICENSE.md`.
