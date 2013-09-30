@@ -1,7 +1,7 @@
 use std::hashmap::*;
 use super::settings::*;
 
-pub struct Context {
-  settings: ~Settings,
+pub struct Context<'self> {
+  settings: &'self Settings,
   params: HashMap<~str, Option<~str>>,
 }

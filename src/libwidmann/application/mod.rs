@@ -13,23 +13,23 @@ pub mod context;
 
 #[deriving(Clone)]
 pub struct Application<T> {
-  routes: ~Routes<T>,
-  settings: ~Settings
+  routes: Routes<T>,
+  settings: Settings
 }
 
 impl<T: ToResponse> Application<T> {
   pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
-    let mut app = ~Application { routes: ~Routes::new(), settings: ~Settings::new() };
+    let mut app = ~Application { routes: Routes::new(), settings: Settings::new() };
     create(app);
     *app
   }
 
   pub fn settings<'a>(&'a mut self, config: &fn(&'a mut Settings)) {
-    config(self.settings)
+    config(&'a mut self.settings)
   }
 
   pub fn routes<'a>(&'a mut self, draw: &fn(&'a mut Routes<T>)) {
-    draw(self.routes)
+    draw(&'a mut self.routes)
   }
 
   pub fn call(&self, request: &Request) -> Response {
@@ -37,7 +37,7 @@ impl<T: ToResponse> Application<T> {
       Some(route) => {
         match route {
           MatchedRoute { params, f } => {
-            let ctx = Context { settings: self.settings.clone(), params: params };
+            let ctx = Context { settings: &self.settings, params: params };
             let result = f(&ctx, request);
             result.to_response()
           }
