@@ -1,3 +1,6 @@
 [submodule "rust-http"]
 	path = rust-http
 	url = https://github.com/skade/rust-http.git
+[submodule "rust-pcre"]
+	path = rust-pcre
+	url = https://github.com/skade/rust-pcre.git

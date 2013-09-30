@@ -39,4 +39,3 @@ fn main() {
     let server = WidmannServer::new(app);
     server.serve_forever();
 }
-
