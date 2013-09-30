@@ -1,7 +1,6 @@
 # Widmann
 
-
-Every language it's Sinatra clone, so here is one for Rust.
+Sinatra's law: given enough time, every programming language will see an attempt at a Sinatra clone. Here's mine in Rust.
 
 Consider this a proof of concept, it has some glaring bugs. (try POSTing to `/foo`)
 
