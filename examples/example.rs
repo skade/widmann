@@ -7,6 +7,9 @@ extern mod widmannserver;
 
 use http::server::{ServerUtil, Request};
 use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
+use std::os;
+
+use extra::getopts::*;
 
 use widmann::application::context::*;
 use widmann::application::*;
@@ -26,10 +29,28 @@ fn hello_post(_context: &Context, _request: &Request) -> ~str {
 }
 
 fn main() {
+    let args = os::args();
+
+    let opts = ~[
+      optopt("p"),
+      optopt("port"),
+    ];
+
+    let matches = match getopts(args.tail(), opts) {
+      Ok(m) => { m }
+      Err(f) => { fail!(f.to_err_msg()) }
+    };
+
+    let port_option = matches.opts_str([~"p", ~"port"]);
+    let port: int = match port_option {
+      Some(option) => { from_str(option).expect("--port given but not a proper number") }
+      None => { 4000 }
+    };
+
     let app = do Application::new |app|
       {
         do app.settings |settings| {
-          settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 4000 })
+          settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: port as u16 })
         }
         do app.routes |routes| {
           routes.get(~"/foo/(?<id>.*)", hello_world);
