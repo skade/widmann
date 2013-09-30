@@ -1,2 +1,2 @@
-deb http://ppa.launchpad.net/hansjorg/rust/ubuntu precise main
-deb-src http://ppa.launchpad.net/hansjorg/rust/ubuntu precise main
+deb http://ppa.launchpad.net/florian-gilcher/rust-nightly/ubuntu lucid main
+deb-src http://ppa.launchpad.net/florian-gilcher/rust-nightly/ubuntu lucid main
