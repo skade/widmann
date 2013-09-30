@@ -43,6 +43,8 @@ fn main() {
 
 ## Installation
 
+Make sure to have a recent Rust, `0.8` is not enough. I currently test with mozilla/rust@9883a6;
+
 Currently, no `rustpkg` is available, as both projects this one depends on cannot be built using `rustpkg`. A Makefile is provided to get you started:
 
 ```
