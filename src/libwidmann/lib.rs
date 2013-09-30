@@ -5,7 +5,7 @@
 #[crate_type = "lib"];
 #[link_args = "-lpcre"];
 
-extern mod pcre;
+extern mod pcre = "github.com/skade/rust-pcre";
 extern mod http;
 extern mod extra;
 
