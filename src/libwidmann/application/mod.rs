@@ -1,28 +1,20 @@
 use self::routes::*;
 use self::response::*;
+use self::settings::*;
+use self::context::*;
 
 use http::server::Request;
 use http::status::NotFound;
-use std::rt::io::net::ip::SocketAddr;
 
 pub mod routes;
 pub mod response;
+pub mod settings;
+pub mod context;
 
 #[deriving(Clone)]
 pub struct Application<T> {
   routes: ~Routes<T>,
   settings: ~Settings
-}
-
-#[deriving(Clone)]
-pub struct Settings {
-  socket: Option<SocketAddr>
-}
-
-impl Settings {
-  fn new() -> Settings {
-    Settings { socket: None }
-  }
 }
 
 impl<T: ToResponse> Application<T> {
@@ -43,9 +35,14 @@ impl<T: ToResponse> Application<T> {
   pub fn call(&self, request: &Request) -> Response {
     match self.routes.find(request) {
       Some(route) => {
-        let f = route.f;
-        let result = f(request);
-        result.to_response()
+        match route {
+          MatchedRoute { params, f } => {
+            let ctx = Context { settings: self.settings.clone(), params: params };
+            let result = f(&ctx, request);
+            result.to_response()
+          }
+        }
+
       },
       None => {
         Response::new(NotFound, ~"Not Found")

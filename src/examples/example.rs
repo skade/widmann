@@ -8,14 +8,20 @@ extern mod widmannserver;
 use http::server::{ServerUtil, Request};
 use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
 
+use widmann::application::context::*;
 use widmann::application::*;
 use widmannserver::*;
 
-fn hello_world(_request: &Request) -> ~str {
-  ~"Hello World!\n"
+fn hello_world(context: &Context, _request: &Request) -> ~str {
+  let params = &context.params;
+  let id = params.get(&~"id").clone();
+  match id {
+    Some(m) => m.to_owned(),
+    None => ~"pass an ID!"
+  }
 }
 
-fn hello_post(_request: &Request) -> ~str {
+fn hello_post(_context: &Context, _request: &Request) -> ~str {
   ~"Thanks for the POST!\n"
 }
 
@@ -26,7 +32,7 @@ fn main() {
           settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 4000 })
         }
         do app.routes |routes| {
-          routes.get(~"/foo/(?<bar>.*)", hello_world);
+          routes.get(~"/foo/(?<id>.*)", hello_world);
           routes.post(~"/", hello_post);
         }
       };
