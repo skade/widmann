@@ -51,7 +51,13 @@ git submodule update --init
 make
 ```
 
-Should do the trick. Have a look at the `examples` folder.
+Should do the trick. Have a look at the `examples` folder. If all went well, you can try it out:
+
+```
+build/example
+
+curl localhost:4000/foo/bar
+```
 
 ## License
 
