@@ -33,11 +33,14 @@ impl SocketSettings for Settings {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use knob::Settings;
+
   #[test]
   fn test_insert() {
     let mut settings = Settings::new();
     settings.set("port", "12345");
     settings.set("ip", "127.0.0.1");
-    settings.socket();
+    let socket = settings.socket();
+    assert_eq!(socket.to_str(), ~"127.0.0.1:12345")
   }
 }
