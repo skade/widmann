@@ -40,7 +40,7 @@ impl<T: ToResponse> Application<T> {
         match route {
           MatchedRoute { params, f } => {
             let ctx = Context { settings: &self.settings, params: params, request: request };
-            let result = f(&ctx);
+            let result = f(ctx);
             result.to_response()
           }
         }
