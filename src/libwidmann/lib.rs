@@ -8,5 +8,6 @@
 extern mod pcre;
 extern mod http;
 extern mod extra;
+extern mod knob;
 
 pub mod application;

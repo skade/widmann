@@ -1,5 +1,5 @@
 use std::hashmap::*;
-use super::settings::*;
+use knob::Settings;
 
 pub struct Context<'self> {
   settings: &'self Settings,

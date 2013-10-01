@@ -4,15 +4,16 @@ extern mod extra;
 extern mod http;
 extern mod widmann;
 extern mod widmannserver;
+extern mod knob;
 
 use http::server::{ServerUtil, Request};
 
 use extra::getopts::groups::*;
 
-use widmann::application::settings::*;
 use widmann::application::context::*;
 use widmann::application::*;
 use widmannserver::*;
+use knob::Settings;
 
 enum Environment {
   Development,

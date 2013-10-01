@@ -5,6 +5,7 @@ use self::context::*;
 
 use http::server::Request;
 use http::status::NotFound;
+use knob::Settings;
 
 pub mod routes;
 pub mod response;
@@ -21,7 +22,7 @@ impl<T: ToResponse> Application<T> {
   pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
     let mut app = ~Application { routes: Routes::new(), settings: Settings::new() };
     create(app);
-    app.settings.compile();
+    app.settings.load_os_args();
     *app
   }
 
