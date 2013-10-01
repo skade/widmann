@@ -6,7 +6,7 @@ extern mod widmann;
 extern mod widmannserver;
 extern mod knob;
 
-use http::server::{ServerUtil, Request};
+use http::server::ServerUtil;
 
 use extra::getopts::groups::*;
 
@@ -55,7 +55,7 @@ impl MySettings for Settings {
   }
 }
 
-fn hello_world(context: &Context, _request: &Request) -> ~str {
+fn hello_world(context: &Context) -> ~str {
   let params = &context.params;
   let id = params.get_copy(&~"id");
   match id {
@@ -64,7 +64,7 @@ fn hello_world(context: &Context, _request: &Request) -> ~str {
   }
 }
 
-fn hello_post(_context: &Context, _request: &Request) -> ~str {
+fn hello_post(_context: &Context) -> ~str {
   ~"Thanks for the POST!\n"
 }
 

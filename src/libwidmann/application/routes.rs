@@ -11,7 +11,7 @@ use http::method::*;
 pub struct Route<T> {
   method: Method,
   path: ~str,
-  f: extern fn(&Context, &Request) -> T,
+  f: extern fn(&Context) -> T,
 }
 
 impl<T> Clone for Route<T> {
@@ -22,7 +22,7 @@ impl<T> Clone for Route<T> {
 
 pub struct MatchedRoute<T> {
   params: HashMap<~str, Option<~str>>,
-  f: extern fn(&Context, &Request) -> T,
+  f: extern fn(&Context) -> T,
 }
 
 impl<T> Clone for MatchedRoute<T> {
@@ -32,7 +32,7 @@ impl<T> Clone for MatchedRoute<T> {
 }
 
 impl<T> Route<T> {
-  pub fn new(method: Method, path: ~str, routeFn: extern fn(&Context, &Request) -> T) -> Route<T> {
+  pub fn new(method: Method, path: ~str, routeFn: extern fn(&Context) -> T) -> Route<T> {
     Route { method: method, path: path, f: routeFn }
   }
 }
@@ -76,13 +76,13 @@ impl<T> Routes<T> {
     }
   }
 
-  pub fn route(&mut self, method: Method, path: ~str, routeFn: extern fn(&Context, &Request) -> T) {
+  pub fn route(&mut self, method: Method, path: ~str, routeFn: extern fn(&Context) -> T) {
     self.routes.push(Route::new(method, path, routeFn))
   }
 
-  pub fn get(&mut self, path: ~str, routeFn: extern fn(&Context, &Request) -> T) { self.route(Get, path, routeFn) }
-  pub fn post(&mut self, path: ~str, routeFn: extern fn(&Context, &Request) -> T) { self.route(Post, path, routeFn) }
-  pub fn put(&mut self, path: ~str, routeFn: extern fn(&Context, &Request) -> T) { self.route(Put, path, routeFn) }
-  pub fn delete(&mut self, path: ~str, routeFn: extern fn(&Context, &Request) -> T) { self.route(Delete, path, routeFn) }
-  pub fn patch(&mut self, path: ~str, routeFn: extern fn(&Context, &Request) -> T) { self.route(Patch, path, routeFn) }
+  pub fn get(&mut self, path: ~str, routeFn: extern fn(&Context) -> T) { self.route(Get, path, routeFn) }
+  pub fn post(&mut self, path: ~str, routeFn: extern fn(&Context) -> T) { self.route(Post, path, routeFn) }
+  pub fn put(&mut self, path: ~str, routeFn: extern fn(&Context) -> T) { self.route(Put, path, routeFn) }
+  pub fn delete(&mut self, path: ~str, routeFn: extern fn(&Context) -> T) { self.route(Delete, path, routeFn) }
+  pub fn patch(&mut self, path: ~str, routeFn: extern fn(&Context) -> T) { self.route(Patch, path, routeFn) }
 }

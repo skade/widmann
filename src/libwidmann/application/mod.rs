@@ -39,8 +39,8 @@ impl<T: ToResponse> Application<T> {
       Some(route) => {
         match route {
           MatchedRoute { params, f } => {
-            let ctx = Context { settings: &self.settings, params: params };
-            let result = f(&ctx, request);
+            let ctx = Context { settings: &self.settings, params: params, request: request };
+            let result = f(&ctx);
             result.to_response()
           }
         }
