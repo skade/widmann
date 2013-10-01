@@ -72,6 +72,7 @@ fn main() {
       {
         do app.settings |settings| {
           settings.opt(optopt("p", "port", "the port to bind to", "4000"));
+          settings.set("ip", "127.0.0.1");
           settings.set("environment", Production);
         }
         do app.routes |routes| {
