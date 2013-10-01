@@ -33,7 +33,11 @@ impl<T> Clone for MatchedRoute<T> {
 
 impl<T> Route<T> {
   pub fn new(method: Method, path: ~str, routeFn: extern fn(Context) -> T) -> Route<T> {
-    Route { method: method, path: path, f: routeFn }
+    let mut pattern = path;
+    if !pattern.ends_with("$") {
+      pattern.push_char('$');
+    }
+    Route { method: method, path: pattern, f: routeFn }
   }
 }
 

@@ -30,3 +30,9 @@ impl ToResponse for ~str {
     response
   }
 }
+
+impl ToResponse for () {
+  fn to_response(self) -> Response {
+    Response::new(Ok, ~"")
+  }
+}
