@@ -21,11 +21,12 @@ impl<T: ToResponse> Application<T> {
   pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
     let mut app = ~Application { routes: Routes::new(), settings: Settings::new() };
     create(app);
+    app.settings.compile();
     *app
   }
 
   pub fn settings<'a>(&'a mut self, config: &fn(&'a mut Settings)) {
-    config(&'a mut self.settings)
+    config(&'a mut self.settings);
   }
 
   pub fn routes<'a>(&'a mut self, draw: &fn(&'a mut Routes<T>)) {

@@ -6,9 +6,8 @@ extern mod widmann;
 extern mod widmannserver;
 
 use http::server::{ServerUtil, Request};
-use std::os;
 
-use extra::getopts::*;
+use extra::getopts::groups::*;
 
 use widmann::application::settings::*;
 use widmann::application::context::*;
@@ -69,24 +68,10 @@ fn hello_post(_context: &Context, _request: &Request) -> ~str {
 }
 
 fn main() {
-    let args = os::args();
-
-    let opts = ~[
-      optopt("p"),
-      optopt("port"),
-    ];
-
-    let matches = match getopts(args.tail(), opts) {
-      Ok(m) => { m }
-      Err(f) => { fail!(f.to_err_msg()) }
-    };
-
-    let port = matches.opts_str([~"p", ~"port"]);
-
     let app = do Application::new |app|
       {
         do app.settings |settings| {
-          settings.opt("port", port.clone());
+          settings.opt("port", optopt("p", "port", "the port to bind to", "4000"));
           settings.set("environment", Production);
         }
         do app.routes |routes| {

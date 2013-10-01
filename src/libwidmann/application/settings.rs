@@ -1,25 +1,56 @@
 use std::hashmap::*;
 use std::rt::io::net::ip::{SocketAddr, IpAddr, Ipv4Addr};
+use std::os;
+use extra::getopts::groups::*;
 
 #[deriving(Clone)]
 pub struct Settings {
   priv store: HashMap<~str,~str>,
+  priv options: HashMap<~str, OptGroup>,
 }
 
 impl Settings {
   pub fn new() -> Settings {
-    Settings { store: HashMap::new() }
+    Settings { store: HashMap::new(), options: HashMap::new() }
   }
 
+  pub fn compile(&mut self) {
+    debug!("compiling options");
 
-  pub fn opt<A: ToStr, T: ToStr>(&mut self, setting: A, value: Option<T>) {
-    if !value.is_none() {
-      self.store.swap(setting.to_str(), value.unwrap().to_str());
-    }
+    let args = os::args();
+    let mut options = ~[];
+    do self.options.each_value() |v| {
+      options.push(v.clone()); true
+    };
+
+    debug!(options);
+
+    let matches = match getopts(args.tail(), options) {
+      Ok(m) => { m }
+      Err(f) => { fail!(f.to_err_msg()) }
+    };
+
+    debug!(matches);
+
+    let given_options = self.options.clone();
+    for (setting, opt) in given_options.iter() {
+      let opt_strings = &[opt.short_name.clone(), opt.long_name.clone()];
+      self.set_opt(setting.to_owned(), matches.opts_str(opt_strings))
+    };
+  }
+
+  pub fn opt<A: ToStr>(&mut self, setting: A, opt: OptGroup) {
+    self.options.swap(setting.to_str(), opt);
   }
 
   pub fn set<A: ToStr, T: ToStr>(&mut self, setting: A, value: T) {
     self.store.swap(setting.to_str(), value.to_str());
+  }
+
+  pub fn set_opt<A: ToStr, T: ToStr>(&mut self, setting: A, value: Option<T>) {
+    if !value.is_none() {
+      self.store.swap(setting.to_str(), value.unwrap().to_str());
+    }
   }
 
   pub fn fetch_with<A: ToStr, T: FromStr>(&self, setting: A, f: &fn(Option<T>) -> T) -> T {
