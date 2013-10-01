@@ -8,7 +8,6 @@ extern mod extra;
 extern mod http;
 extern mod widmann;
 
-use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
 use std::rt::io::Writer;
 use extra::time;
 
@@ -16,6 +15,7 @@ use http::server::{Config, Server, Request, ResponseWriter};
 
 use widmann::application::*;
 use widmann::application::response::*;
+use widmann::application::settings::*;
 
 #[deriving(Clone)]
 pub struct WidmannServer<T> {
@@ -30,15 +30,8 @@ impl<T> WidmannServer<T> {
 
 impl<T: ToResponse> Server for WidmannServer<T> {
   fn get_config(&self) -> Config {
-    let socket = self.application.settings.socket;
-    match socket {
-      Some(socket) => {
-        Config { bind_address: socket }
-      },
-      None => {
-        Config { bind_address: SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 8001 } }
-      }
-    }
+    let socket = self.application.settings.socket();
+    Config { bind_address: socket }
   }
 
   fn handle_request(&self, r: &Request, w: &mut ResponseWriter) {

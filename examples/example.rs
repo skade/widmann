@@ -6,14 +6,54 @@ extern mod widmann;
 extern mod widmannserver;
 
 use http::server::{ServerUtil, Request};
-use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
 use std::os;
 
 use extra::getopts::*;
 
+use widmann::application::settings::*;
 use widmann::application::context::*;
 use widmann::application::*;
 use widmannserver::*;
+
+enum Environment {
+  Development,
+  Production,
+  Test,
+  Other(~str)
+}
+
+impl ToStr for Environment {
+  fn to_str(&self) -> ~str {
+    match *self {
+      Development => { ~"development" },
+      Production => { ~"production" },
+      Test => { ~"test" },
+      Other(ref string) => { string.to_owned() }
+    }
+  }
+}
+
+impl FromStr for Environment {
+  fn from_str(string: &str) -> Option<Environment> {
+    let env = match string {
+      "development" => { Development },
+      "production" => { Production },
+      "test" => { Test },
+      string => { Other(string.to_owned()) }
+    };
+    Some(env)
+  }
+}
+
+trait MySettings {
+  fn environment(&self) -> Environment;
+}
+
+impl MySettings for Settings {
+  fn environment(&self) -> Environment {
+    self.fetch("environment").expect("environment has to be provided!")
+  }
+}
 
 fn hello_world(context: &Context, _request: &Request) -> ~str {
   let params = &context.params;
@@ -41,16 +81,13 @@ fn main() {
       Err(f) => { fail!(f.to_err_msg()) }
     };
 
-    let port_option = matches.opts_str([~"p", ~"port"]);
-    let port: int = match port_option {
-      Some(option) => { from_str(option).expect("--port given but not a proper number") }
-      None => { 4000 }
-    };
+    let port = matches.opts_str([~"p", ~"port"]);
 
     let app = do Application::new |app|
       {
         do app.settings |settings| {
-          settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: port as u16 })
+          settings.opt("port", port.clone());
+          settings.set("environment", Production);
         }
         do app.routes |routes| {
           routes.get(~"/foo/(?<id>.*)", hello_world);
