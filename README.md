@@ -1,5 +1,7 @@
 # Widmann
 
+[![Build Status](https://travis-ci.org/skade/widmann.png)](https://travis-ci.org/skade/widmann)
+
 Sinatra's law: given enough time, every programming language will see an attempt at a Sinatra clone. Here's mine in Rust.
 
 This is obviously a proof of concept, it has some glaring bugs (try POSTing to `/foo`) and no features beyond routing.
