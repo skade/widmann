@@ -71,7 +71,7 @@ fn main() {
     let app = do Application::new |app|
       {
         do app.settings |settings| {
-          settings.opt("port", optopt("p", "port", "the port to bind to", "4000"));
+          settings.opt(optopt("p", "port", "the port to bind to", "4000"));
           settings.set("environment", Production);
         }
         do app.routes |routes| {

@@ -28,7 +28,11 @@ fn main() {
     let app = do Application::new |app|
       {
         do app.settings |settings| {
-          settings.socket = Some(SocketAddr { ip: Ipv4Addr(127, 0, 0, 1), port: 4000 })
+          settings.set("ip", "127.0.0.1");
+          settings.set("port", 4000);
+          // you can even use:
+          // settings.opt(optopt("p", "port", "the port to bind to", "default: 4000"))
+          // the long name is the settings name
         }
         do app.routes |routes| {
           routes.get(~"/foo/(?<id>.*)", hello_world);

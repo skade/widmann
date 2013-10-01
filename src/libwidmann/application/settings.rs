@@ -6,26 +6,21 @@ use extra::getopts::groups::*;
 #[deriving(Clone)]
 pub struct Settings {
   priv store: HashMap<~str,~str>,
-  priv options: HashMap<~str, OptGroup>,
+  priv options: ~[OptGroup],
 }
 
 impl Settings {
   pub fn new() -> Settings {
-    Settings { store: HashMap::new(), options: HashMap::new() }
+    Settings { store: HashMap::new(), options: ~[] }
   }
 
   pub fn compile(&mut self) {
     debug!("compiling options");
 
     let args = os::args();
-    let mut options = ~[];
-    do self.options.each_value() |v| {
-      options.push(v.clone()); true
-    };
 
-    debug!(options);
 
-    let matches = match getopts(args.tail(), options) {
+    let matches = match getopts(args.tail(), self.options) {
       Ok(m) => { m }
       Err(f) => { fail!(f.to_err_msg()) }
     };
@@ -33,14 +28,14 @@ impl Settings {
     debug!(matches);
 
     let given_options = self.options.clone();
-    for (setting, opt) in given_options.iter() {
+    for opt in given_options.iter() {
       let opt_strings = &[opt.short_name.clone(), opt.long_name.clone()];
-      self.set_opt(setting.to_owned(), matches.opts_str(opt_strings))
+      self.set_opt(opt.long_name.clone(), matches.opts_str(opt_strings))
     };
   }
 
-  pub fn opt<A: ToStr>(&mut self, setting: A, opt: OptGroup) {
-    self.options.swap(setting.to_str(), opt);
+  pub fn opt(&mut self, opt: OptGroup) {
+    self.options.push(opt);
   }
 
   pub fn set<A: ToStr, T: ToStr>(&mut self, setting: A, value: T) {
