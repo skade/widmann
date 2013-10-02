@@ -140,7 +140,49 @@ mod tests {
   fn test_parameters() {
     let app = do Application::new |app| {
       do app.routes |routes| {
-        routes.get(~"/foo/(?<id>\\d+)", dummy)
+        routes.get(~"/foo/(?<id>\\d+)", assert_id)
+      }
+    };
+    let res = app.call(&get(~"/foo/123"));
+    assert_eq!(res.status, Ok);
+    let res = app.call(&get(~"/foo"));
+    assert_eq!(res.status, NotFound);
+  }
+
+  fn assert_ids_given(context: Context) {
+    let params = context.params;
+    let id: Option<~str> = params.fetch("id");
+    let bar_id: Option<~str> = params.fetch("bar_id");
+
+    assert_eq!(id, Some(~"123"))
+    assert_eq!(bar_id, Some(~"456"))
+  }
+
+  #[test]
+  fn test_optional_parameters_given() {
+    let app = do Application::new |app| {
+      do app.routes |routes| {
+        routes.get(~"/foo/(?<id>\\d+)(?:/bar/(?<bar_id>\\d+))?", assert_ids_given)
+      }
+    };
+    let res = app.call(&get(~"/foo/123/bar/456"));
+    assert_eq!(res.status, Ok);
+  }
+
+  fn assert_ids_missing(context: Context) {
+    let params = context.params;
+    let id: Option<~str> = params.fetch("id");
+    let bar_id: Option<~str> = params.fetch("bar_id");
+
+    assert_eq!(id, Some(~"123"))
+    assert_eq!(bar_id, None)
+  }
+
+  #[test]
+  fn test_optional_parameters_missing() {
+    let app = do Application::new |app| {
+      do app.routes |routes| {
+        routes.get(~"/foo/(?<id>\\d+)(?:/bar/(?<bar_id>\\d+))?", assert_ids_missing)
       }
     };
     let res = app.call(&get(~"/foo/123"));
