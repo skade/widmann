@@ -28,7 +28,7 @@ impl<T> WidmannServer<T> {
   }
 }
 
-impl<T: ToResponse> Server for WidmannServer<T> {
+impl<T: ToResponse + Clone> Server for WidmannServer<T> {
   fn get_config(&self) -> Config {
     let socket = self.application.settings.socket();
     Config { bind_address: socket }

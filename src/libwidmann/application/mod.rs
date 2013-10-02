@@ -19,7 +19,7 @@ pub struct Application<T> {
   settings: Settings
 }
 
-impl<T: ToResponse> Application<T> {
+impl<T: ToResponse + Clone> Application<T> {
   pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
     let mut app = ~Application { routes: Routes::new(), settings: Settings::new() };
     create(app);
@@ -36,16 +36,12 @@ impl<T: ToResponse> Application<T> {
   }
 
   pub fn call(&self, request: &Request) -> Response {
-    match self.routes.find(request) {
+    match self.routes.clone().find(request) {
       Ok(route) => {
-        match route {
-          MatchedRoute { method, params, f } => {
-            let ctx = Context { settings: &self.settings, params: params, request: request };
-            let result = f(ctx);
-            result.to_response()
-          }
-        }
-
+        let real_route = route.route.clone();
+        let ctx = Context { settings: &self.settings, params: route.params, request: request };
+        let result = real_route.call(ctx);
+        result.to_response()
       },
       Err(error) => {
         match error {

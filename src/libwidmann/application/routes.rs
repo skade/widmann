@@ -10,7 +10,14 @@ use http::method::*;
 pub struct Route<T> {
   method: Method,
   path: ~str,
-  f: extern fn(Context) -> T,
+  priv f: extern fn(Context) -> T,
+}
+
+impl<T> Route<T> {
+  pub fn call(&self, context: Context) -> T {
+    let f = self.f;
+    f(context)
+  }
 }
 
 impl<T> Clone for Route<T> {
@@ -19,16 +26,10 @@ impl<T> Clone for Route<T> {
   }
 }
 
+#[deriving(Clone)]
 pub struct MatchedRoute<T> {
-  method: Method,
+  route: Route<T>,
   params: Params,
-  f: extern fn(Context) -> T,
-}
-
-impl<T> Clone for MatchedRoute<T> {
-  fn clone(&self) -> MatchedRoute<T> {
-    MatchedRoute { method: self.method.clone(), params: self.params.clone(), f: self.f }
-  }
 }
 
 impl<T> Route<T> {
@@ -51,12 +52,12 @@ pub enum RouteMatchError {
   MethodNotAllowedError
 }
 
-impl<T> Routes<T> {
+impl<T: Clone> Routes<T> {
   pub fn new() -> Routes<T> {
     Routes { routes: ~[] }
   }
 
-  pub fn find<'a>(&'a self, request: &Request) -> Result<MatchedRoute<T>, RouteMatchError> {
+  pub fn find(self, request: &Request) -> Result<MatchedRoute<T>, RouteMatchError> {
     match request.request_uri {
       AbsolutePath(ref path) => {
         let matched_routes = self.routes.iter().filter_map(|route| {
@@ -64,7 +65,7 @@ impl<T> Routes<T> {
           match res {
             Ok(m) => {
               let params = Params::from_match(m);
-              Some(MatchedRoute { method: route.method.clone(), params: params, f: route.f })
+              Some(MatchedRoute { route: route.clone(), params: params })
             }
             Err(_) => { None }
           }
@@ -74,8 +75,8 @@ impl<T> Routes<T> {
           return Err(NotFoundError)
         };
 
-        let route = matched_routes.iter().find(|r| {
-          r.method == request.method
+        let route = matched_routes.iter().find(|m| {
+          m.route.method == request.method
         });
 
         if route.is_none() {
