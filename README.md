@@ -4,7 +4,7 @@
 
 Sinatra's law: given enough time, every programming language will see an attempt at a Sinatra clone. Here's mine in Rust.
 
-This is obviously a proof of concept, it has some glaring bugs (try POSTing to `/foo`) and no features beyond routing.
+This is obviously a proof of concept, with no features beyond routing and settings.
 
 ## Usage
 
@@ -48,7 +48,7 @@ fn main() {
 
 ## Installation
 
-Make sure to have a recent Rust, `0.8` is not enough. I currently test with mozilla/rust@9883a6;
+Make sure to have a recent Rust, `0.8` is not enough. I currently test with mozilla/rust@5409983;
 
 Currently, no `rustpkg` is available, as both projects this one depends on cannot be built using `rustpkg`. A Makefile is provided to get you started:
 
@@ -67,10 +67,7 @@ curl localhost:4000/foo/bar
 
 ## TODO
 
-* Make route matching stricter
-* Implement a proper settings system
 * Templating
-* Allow to route to almost anything using traits
 
 ## License
 
