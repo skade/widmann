@@ -57,26 +57,29 @@ impl<T: Clone> Routes<T> {
     Routes { routes: ~[] }
   }
 
-  pub fn find(self, request: &Request) -> Result<MatchedRoute<T>, RouteMatchError> {
+  pub fn find(self, request: &Request) -> Result<(Route<T>, Params), RouteMatchError> {
     match request.request_uri {
       AbsolutePath(ref path) => {
-        let matched_routes = self.routes.iter().filter_map(|route| {
+        let mut matched_routes = ~[];
+        for route in self.routes.iter() {
           let res = search(route.path.clone(), *path, PCRE_ANCHORED);
           match res {
             Ok(m) => {
               let params = Params::from_match(m);
-              Some(MatchedRoute { route: route.clone(), params: params })
+              matched_routes.push((route.clone(), params));
             }
-            Err(_) => { None }
+            Err(_) => { }
           }
-        }).to_owned_vec();
+        };
 
         if matched_routes.len() == 0 {
           return Err(NotFoundError)
         };
 
         let route = matched_routes.iter().find(|m| {
-          m.route.method == request.method
+          match **m {
+            (ref route, _) => route.method == request.method
+          }
         });
 
         if route.is_none() {

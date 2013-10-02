@@ -37,10 +37,9 @@ impl<T: ToResponse + Clone> Application<T> {
 
   pub fn call(&self, request: &Request) -> Response {
     match self.routes.clone().find(request) {
-      Ok(route) => {
-        let real_route = route.route.clone();
-        let ctx = Context { settings: &self.settings, params: route.params, request: request };
-        let result = real_route.call(ctx);
+      Ok((route, params)) => {
+        let ctx = Context { settings: &self.settings, params: params, request: request };
+        let result = route.call(ctx);
         result.to_response()
       },
       Err(error) => {
