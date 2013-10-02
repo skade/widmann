@@ -55,9 +55,19 @@ impl MySettings for Settings {
   }
 }
 
+struct Foo {
+  string: ~str
+}
+
+impl FromStr for Foo {
+  fn from_str(string: &str) -> Option<Foo> {
+    Some(Foo { string: string.to_owned() })
+  }
+}
+
 fn hello_world(context: Context) -> ~str {
   let params = &context.params;
-  let id = params.get_copy(&~"id");
+  let id: Option<~str> = params.fetch(~"id");
   match id {
     Some(m) => m.to_owned(),
     None => ~"pass an ID!"

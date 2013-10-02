@@ -1,9 +1,8 @@
 use super::context::*;
+use super::params::*;
 
 use pcre::pcre::*;
 use pcre::consts::*;
-
-use std::hashmap::*;
 
 use http::server::request::{Request, AbsolutePath};
 use http::method::*;
@@ -22,7 +21,7 @@ impl<T> Clone for Route<T> {
 
 pub struct MatchedRoute<T> {
   method: Method,
-  params: HashMap<~str, Option<~str>>,
+  params: Params,
   f: extern fn(Context) -> T,
 }
 
@@ -64,16 +63,8 @@ impl<T> Routes<T> {
           let res = search(route.path.clone(), *path, PCRE_ANCHORED);
           match res {
             Ok(m) => {
-              let mut map = HashMap::new();
-              let group_names = m.group_names();
-              for name in group_names.iter() {
-                let group = m.named_group(*name);
-                match group {
-                  Some(str) => { map.insert(name.to_owned(), Some(str.to_owned())); }
-                  None => { map.insert(name.to_owned(), None); }
-                }
-              }
-              Some(MatchedRoute { method: route.method.clone(), params: map, f: route.f })
+              let params = Params::from_match(m);
+              Some(MatchedRoute { method: route.method.clone(), params: params, f: route.f })
             }
             Err(_) => { None }
           }

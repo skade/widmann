@@ -11,6 +11,7 @@ pub mod routes;
 pub mod response;
 pub mod settings;
 pub mod context;
+pub mod params;
 
 #[deriving(Clone)]
 pub struct Application<T> {
@@ -126,5 +127,23 @@ mod tests {
     };
     let res = app.call(&get(~"/foo"));
     assert_eq!(res.status, MethodNotAllowed);
+  }
+
+  fn assert_id(context: Context) {
+    let params = context.params;
+    let id: Option<~str> = params.fetch(~"id");
+
+    assert_eq!(id, Some(~"123"))
+  }
+
+  #[test]
+  fn test_parameters() {
+    let app = do Application::new |app| {
+      do app.routes |routes| {
+        routes.get(~"/foo/(?<id>\\d+)", dummy)
+      }
+    };
+    let res = app.call(&get(~"/foo/123"));
+    assert_eq!(res.status, Ok);
   }
 }
