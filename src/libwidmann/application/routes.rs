@@ -21,13 +21,14 @@ impl<T> Clone for Route<T> {
 }
 
 pub struct MatchedRoute<T> {
+  method: Method,
   params: HashMap<~str, Option<~str>>,
   f: extern fn(Context) -> T,
 }
 
 impl<T> Clone for MatchedRoute<T> {
   fn clone(&self) -> MatchedRoute<T> {
-    MatchedRoute { params: self.params.clone(), f: self.f }
+    MatchedRoute { method: self.method.clone(), params: self.params.clone(), f: self.f }
   }
 }
 
@@ -46,37 +47,54 @@ pub struct Routes<T> {
   routes: ~[Route<T>]
 }
 
+pub enum RouteMatchError {
+  NotFoundError,
+  MethodNotAllowedError
+}
+
 impl<T> Routes<T> {
   pub fn new() -> Routes<T> {
     Routes { routes: ~[] }
   }
 
-  pub fn find<'a>(&'a self, request: &Request) -> Option<MatchedRoute<T>> {
+  pub fn find<'a>(&'a self, request: &Request) -> Result<MatchedRoute<T>, RouteMatchError> {
     match request.request_uri {
       AbsolutePath(ref path) => {
-        for route in self.routes.iter() {
-          if route.method == request.method {
-            let res = search(route.path.clone(), *path, PCRE_ANCHORED);
-            match res {
-              Ok(m) => {
-                let mut map = HashMap::new();
-                let group_names = m.group_names();
-                for name in group_names.iter() {
-                  let group = m.named_group(*name);
-                  match group {
-                    Some(str) => { map.insert(name.to_owned(), Some(str.to_owned())); }
-                    None => { map.insert(name.to_owned(), None); }
-                  }
+        let matched_routes = self.routes.iter().filter_map(|route| {
+          let res = search(route.path.clone(), *path, PCRE_ANCHORED);
+          match res {
+            Ok(m) => {
+              let mut map = HashMap::new();
+              let group_names = m.group_names();
+              for name in group_names.iter() {
+                let group = m.named_group(*name);
+                match group {
+                  Some(str) => { map.insert(name.to_owned(), Some(str.to_owned())); }
+                  None => { map.insert(name.to_owned(), None); }
                 }
-                return Some(MatchedRoute { params: map, f: route.f });
               }
-              Err(_) => { }
+              Some(MatchedRoute { method: route.method.clone(), params: map, f: route.f })
             }
+            Err(_) => { None }
           }
+        }).to_owned_vec();
+
+        if matched_routes.len() == 0 {
+          return Err(NotFoundError)
+        };
+
+        let route = matched_routes.iter().find(|r| {
+          r.method == request.method
+        });
+
+        if route.is_none() {
+          return Err(MethodNotAllowedError);
+        } else {
+          return Ok(route.unwrap().clone());
         }
-        return None
+
       },
-      _ => { None }
+      _ => { Err(NotFoundError) }
     }
   }
 

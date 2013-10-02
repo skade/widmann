@@ -4,7 +4,7 @@ use self::settings::*;
 use self::context::*;
 
 use http::server::Request;
-use http::status::NotFound;
+use http::*;
 use knob::Settings;
 
 pub mod routes;
@@ -36,9 +36,9 @@ impl<T: ToResponse> Application<T> {
 
   pub fn call(&self, request: &Request) -> Response {
     match self.routes.find(request) {
-      Some(route) => {
+      Ok(route) => {
         match route {
-          MatchedRoute { params, f } => {
+          MatchedRoute { method, params, f } => {
             let ctx = Context { settings: &self.settings, params: params, request: request };
             let result = f(ctx);
             result.to_response()
@@ -46,8 +46,11 @@ impl<T: ToResponse> Application<T> {
         }
 
       },
-      None => {
-        Response::new(NotFound, ~"Not Found")
+      Err(error) => {
+        match error {
+          NotFoundError => { Response::new(status::NotFound, ~"Not Found") },
+          MethodNotAllowedError => { Response::new(status::MethodNotAllowed, ~"Method not allowed") }
+        }
       }
     }
   }
