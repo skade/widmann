@@ -32,7 +32,7 @@ impl SocketSettings for Settings {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  use super::Settings;
   use knob::Settings;
 
   #[test]

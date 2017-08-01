@@ -1,5 +1,5 @@
-use std::hashmap::*;
-use pcre::pcre::*;
+use std::hashmap::HashMap;
+use pcre::pcre::Match;
 
 #[deriving(Clone)]
 pub struct Params {

@@ -1,11 +1,11 @@
-use super::context::*;
-use super::params::*;
+use super::context::Context;
+use super::params::Params;
 
-use pcre::pcre::*;
-use pcre::consts::*;
+use pcre::pcre::search;
+use pcre::consts::PCRE_ANCHORED;
 
 use http::server::request::{Request, AbsolutePath};
-use http::method::*;
+use http::method::Method;
 
 pub struct Route<T> {
   method: Method,

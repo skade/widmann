@@ -1,10 +1,10 @@
 use knob::Settings;
 use http::server::Request;
 
-use super::params::*;
+use super::params::Params;
 
-pub struct Context<'self> {
-  settings: &'self Settings,
+pub struct Context {
+  settings: Settings,
   params: Params,
-  request: &'self Request
+  request: Request
 }

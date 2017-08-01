@@ -1,10 +1,10 @@
-use self::routes::*;
-use self::response::*;
-use self::settings::*;
-use self::context::*;
+use self::routes::{Route,Routes};
+use self::response::Response;
+use self::settings::SocketSettings;
+use self::context::Context;
 
 use http::server::Request;
-use http::*;
+use http::status::NotFound;
 use knob::Settings;
 
 pub mod routes;
@@ -20,18 +20,18 @@ pub struct Application<T> {
 }
 
 impl<T: ToResponse + Clone> Application<T> {
-  pub fn new(create: &fn (&mut Application<T>)) -> Application<T> {
+  pub fn new(create: |&mut Application<T>|) -> Application<T> {
     let mut app = ~Application { routes: Routes::new(), settings: Settings::new() };
     create(app);
     app.settings.load_os_args();
     *app
   }
 
-  pub fn settings<'a>(&'a mut self, config: &fn(&'a mut Settings)) {
+  pub fn settings<'a>(&'a mut self, config: |&'a mut Settings|) {
     config(&'a mut self.settings);
   }
 
-  pub fn routes<'a>(&'a mut self, draw: &fn(&'a mut Routes<T>)) {
+  pub fn routes<'a>(&'a mut self, draw: |&'a mut Routes<T>|) {
     draw(&'a mut self.routes)
   }
 
@@ -54,12 +54,12 @@ impl<T: ToResponse + Clone> Application<T> {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-  use super::context::*;
+  use super::Application;
+  use super::context::COntext;
 
-  use http::method::*;
-  use http::status::*;
-  use http::server::request::*;
+  use http::method::Get;
+  use http::status::{Ok,NotFound};
+  use http::server::request::Request;
 
   use std::rt::io::net::ip::{SocketAddr, Ipv4Addr};
   use http::headers::request::HeaderCollection;

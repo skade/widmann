@@ -1,4 +1,4 @@
-use http::status::*;
+use http::status::Ok;
 use http::headers::response::HeaderCollection;
 use http::headers::content_type::MediaType;
 

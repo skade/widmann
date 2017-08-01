@@ -68,6 +68,8 @@ curl localhost:4000/foo/bar
 ## TODO
 
 * Templating
+* Cookies
+* Database access examples
 
 ## License
 
